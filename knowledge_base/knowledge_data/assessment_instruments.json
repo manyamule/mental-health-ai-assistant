@@ -1,0 +1,159 @@
+{
+  "phq9": {
+    "name": "Patient Health Questionnaire-9",
+    "description": "Brief depression severity assessment instrument",
+    "questions": [
+      {
+        "id": "phq1",
+        "text": "Over the last 2 weeks, how often have you been bothered by little interest or pleasure in doing things?",
+        "options": [
+          "Not at all",
+          "Several days",
+          "More than half the days",
+          "Nearly every day"
+        ],
+        "scores": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "id": "phq2",
+        "text": "Over the last 2 weeks, how often have you been bothered by feeling down, depressed, or hopeless?",
+        "options": [
+          "Not at all",
+          "Several days",
+          "More than half the days",
+          "Nearly every day"
+        ],
+        "scores": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "id": "phq3",
+        "text": "Over the last 2 weeks, how often have you been bothered by trouble falling or staying asleep, or sleeping too much?",
+        "options": [
+          "Not at all",
+          "Several days",
+          "More than half the days",
+          "Nearly every day"
+        ],
+        "scores": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "id": "phq4",
+        "text": "Over the last 2 weeks, how often have you been bothered by feeling tired or having little energy?",
+        "options": [
+          "Not at all",
+          "Several days",
+          "More than half the days",
+          "Nearly every day"
+        ],
+        "scores": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "id": "phq5",
+        "text": "Over the last 2 weeks, how often have you been bothered by poor appetite or overeating?",
+        "options": [
+          "Not at all",
+          "Several days",
+          "More than half the days",
+          "Nearly every day"
+        ],
+        "scores": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "id": "phq6",
+        "text": "Over the last 2 weeks, how often have you been bothered by feeling bad about yourself \u2014 or that you are a failure or have let yourself or your family down?",
+        "options": [
+          "Not at all",
+          "Several days",
+          "More than half the days",
+          "Nearly every day"
+        ],
+        "scores": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "id": "phq7",
+        "text": "Over the last 2 weeks, how often have you been bothered by trouble concentrating on things, such as reading the newspaper or watching television?",
+        "options": [
+          "Not at all",
+          "Several days",
+          "More than half the days",
+          "Nearly every day"
+        ],
+        "scores": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "id": "phq8",
+        "text": "Over the last 2 weeks, how often have you been bothered by moving or speaking so slowly that other people could have noticed? Or the opposite \u2014 being so fidgety or restless that you have been moving around a lot more than usual?",
+        "options": [
+          "Not at all",
+          "Several days",
+          "More than half the days",
+          "Nearly every day"
+        ],
+        "scores": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "id": "phq9",
+        "text": "Over the last 2 weeks, how often have you been bothered by thoughts that you would be better off dead or of hurting yourself in some way?",
+        "options": [
+          "Not at all",
+          "Several days",
+          "More than half the days",
+          "Nearly every day"
+        ],
+        "scores": [
+          0,
+          1,
+          2,
+          3
+        ]
+      }
+    ],
+    "scoring": {
+      "0-4": "Minimal or no depression",
+      "5-9": "Mild depression",
+      "10-14": "Moderate depression",
+      "15-19": "Moderately severe depression",
+      "20-27": "Severe depression"
+    }
+  }
+}

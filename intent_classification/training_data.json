@@ -1,0 +1,152 @@
+[
+  {
+    "text": "I've been feeling really down lately, nothing seems to make me happy",
+    "intents": [
+      "symptom_report",
+      "emotional_distress",
+      "depression_indicator"
+    ]
+  },
+  {
+    "text": "I don't enjoy things I used to like anymore",
+    "intents": [
+      "symptom_report",
+      "anhedonia",
+      "depression_indicator"
+    ]
+  },
+  {
+    "text": "I'm so tired all the time even when I get enough sleep",
+    "intents": [
+      "symptom_report",
+      "fatigue",
+      "depression_indicator"
+    ]
+  },
+  {
+    "text": "I feel worthless, like I'm just a burden to everyone",
+    "intents": [
+      "symptom_report",
+      "negative_self_perception",
+      "depression_indicator"
+    ]
+  },
+  {
+    "text": "I worry constantly about everything",
+    "intents": [
+      "symptom_report",
+      "worry",
+      "anxiety_indicator"
+    ]
+  },
+  {
+    "text": "Sometimes I get really panicky and feel like I can't breathe",
+    "intents": [
+      "symptom_report",
+      "panic",
+      "anxiety_indicator"
+    ]
+  },
+  {
+    "text": "I'm always on edge waiting for something bad to happen",
+    "intents": [
+      "symptom_report",
+      "hypervigilance",
+      "anxiety_indicator"
+    ]
+  },
+  {
+    "text": "I have trouble falling asleep at night",
+    "intents": [
+      "symptom_report",
+      "insomnia",
+      "sleep_disturbance"
+    ]
+  },
+  {
+    "text": "I wake up several times during the night",
+    "intents": [
+      "symptom_report",
+      "insomnia",
+      "sleep_disturbance"
+    ]
+  },
+  {
+    "text": "I sleep too much, sometimes 12 hours and still feel tired",
+    "intents": [
+      "symptom_report",
+      "hypersomnia",
+      "sleep_disturbance"
+    ]
+  },
+  {
+    "text": "The medication makes me feel dizzy sometimes",
+    "intents": [
+      "medication_mention",
+      "side_effect_report"
+    ]
+  },
+  {
+    "text": "I don't think the antidepressants are working for me",
+    "intents": [
+      "medication_mention",
+      "treatment_concern"
+    ]
+  },
+  {
+    "text": "I stopped taking my pills because they made me feel weird",
+    "intents": [
+      "medication_mention",
+      "treatment_adherence_issue"
+    ]
+  },
+  {
+    "text": "Sometimes I think about ending it all",
+    "intents": [
+      "suicidal_content",
+      "emotional_distress"
+    ]
+  },
+  {
+    "text": "I don't know if I want to live anymore",
+    "intents": [
+      "suicidal_content",
+      "emotional_distress"
+    ]
+  },
+  {
+    "text": "Everyone would be better off without me",
+    "intents": [
+      "suicidal_content",
+      "negative_self_perception"
+    ]
+  },
+  {
+    "text": "I'm fine, nothing really to report",
+    "intents": [
+      "minimal_disclosure",
+      "neutral_response"
+    ]
+  },
+  {
+    "text": "I'm not sure what to say about that",
+    "intents": [
+      "uncertainty",
+      "neutral_response"
+    ]
+  },
+  {
+    "text": "Things have been pretty normal I guess",
+    "intents": [
+      "minimal_disclosure",
+      "neutral_response"
+    ]
+  },
+  {
+    "text": "I'd rather not talk about that right now",
+    "intents": [
+      "resistance",
+      "boundary_setting"
+    ]
+  }
+]

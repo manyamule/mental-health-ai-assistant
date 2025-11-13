@@ -1,0 +1,28 @@
+{
+  "suicide": {
+    "high_risk_indicators": [
+      "Current suicidal ideation with plan and intent",
+      "Recent suicide attempt",
+      "Severe hopelessness",
+      "Psychosis",
+      "Severe substance abuse"
+    ],
+    "moderate_risk_indicators": [
+      "Suicidal ideation without specific plan or intent",
+      "History of suicide attempts",
+      "Moderate depression",
+      "Recent major loss or negative life event"
+    ],
+    "protective_factors": [
+      "Strong social support",
+      "Effective coping skills",
+      "Access to mental health care",
+      "Sense of responsibility to family"
+    ],
+    "response_protocol": {
+      "high_risk": "Immediate intervention required. Contact emergency services.",
+      "moderate_risk": "Safety planning, frequent check-ins, consider referral to crisis services.",
+      "low_risk": "Continue monitoring, ensure follow-up care and support resources."
+    }
+  }
+}

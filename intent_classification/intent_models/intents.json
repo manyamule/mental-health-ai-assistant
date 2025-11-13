@@ -1,0 +1,167 @@
+{
+  "symptom_report": {
+    "description": "Intent: symptom_report",
+    "examples": [
+      "I've been feeling really down lately, nothing seems to make me happy",
+      "I don't enjoy things I used to like anymore",
+      "I'm so tired all the time even when I get enough sleep",
+      "I feel worthless, like I'm just a burden to everyone",
+      "I worry constantly about everything",
+      "Sometimes I get really panicky and feel like I can't breathe",
+      "I'm always on edge waiting for something bad to happen",
+      "I have trouble falling asleep at night",
+      "I wake up several times during the night",
+      "I sleep too much, sometimes 12 hours and still feel tired"
+    ]
+  },
+  "emotional_distress": {
+    "description": "Intent: emotional_distress",
+    "examples": [
+      "I've been feeling really down lately, nothing seems to make me happy",
+      "Sometimes I think about ending it all",
+      "I don't know if I want to live anymore"
+    ]
+  },
+  "depression_indicator": {
+    "description": "Intent: depression_indicator",
+    "examples": [
+      "I've been feeling really down lately, nothing seems to make me happy",
+      "I don't enjoy things I used to like anymore",
+      "I'm so tired all the time even when I get enough sleep",
+      "I feel worthless, like I'm just a burden to everyone"
+    ]
+  },
+  "anhedonia": {
+    "description": "Intent: anhedonia",
+    "examples": [
+      "I don't enjoy things I used to like anymore"
+    ]
+  },
+  "fatigue": {
+    "description": "Intent: fatigue",
+    "examples": [
+      "I'm so tired all the time even when I get enough sleep"
+    ]
+  },
+  "negative_self_perception": {
+    "description": "Intent: negative_self_perception",
+    "examples": [
+      "I feel worthless, like I'm just a burden to everyone",
+      "Everyone would be better off without me"
+    ]
+  },
+  "worry": {
+    "description": "Intent: worry",
+    "examples": [
+      "I worry constantly about everything"
+    ]
+  },
+  "anxiety_indicator": {
+    "description": "Intent: anxiety_indicator",
+    "examples": [
+      "I worry constantly about everything",
+      "Sometimes I get really panicky and feel like I can't breathe",
+      "I'm always on edge waiting for something bad to happen"
+    ]
+  },
+  "panic": {
+    "description": "Intent: panic",
+    "examples": [
+      "Sometimes I get really panicky and feel like I can't breathe"
+    ]
+  },
+  "hypervigilance": {
+    "description": "Intent: hypervigilance",
+    "examples": [
+      "I'm always on edge waiting for something bad to happen"
+    ]
+  },
+  "insomnia": {
+    "description": "Intent: insomnia",
+    "examples": [
+      "I have trouble falling asleep at night",
+      "I wake up several times during the night"
+    ]
+  },
+  "sleep_disturbance": {
+    "description": "Intent: sleep_disturbance",
+    "examples": [
+      "I have trouble falling asleep at night",
+      "I wake up several times during the night",
+      "I sleep too much, sometimes 12 hours and still feel tired"
+    ]
+  },
+  "hypersomnia": {
+    "description": "Intent: hypersomnia",
+    "examples": [
+      "I sleep too much, sometimes 12 hours and still feel tired"
+    ]
+  },
+  "medication_mention": {
+    "description": "Intent: medication_mention",
+    "examples": [
+      "The medication makes me feel dizzy sometimes",
+      "I don't think the antidepressants are working for me",
+      "I stopped taking my pills because they made me feel weird"
+    ]
+  },
+  "side_effect_report": {
+    "description": "Intent: side_effect_report",
+    "examples": [
+      "The medication makes me feel dizzy sometimes"
+    ]
+  },
+  "treatment_concern": {
+    "description": "Intent: treatment_concern",
+    "examples": [
+      "I don't think the antidepressants are working for me"
+    ]
+  },
+  "treatment_adherence_issue": {
+    "description": "Intent: treatment_adherence_issue",
+    "examples": [
+      "I stopped taking my pills because they made me feel weird"
+    ]
+  },
+  "suicidal_content": {
+    "description": "Intent: suicidal_content",
+    "examples": [
+      "Sometimes I think about ending it all",
+      "I don't know if I want to live anymore",
+      "Everyone would be better off without me"
+    ]
+  },
+  "minimal_disclosure": {
+    "description": "Intent: minimal_disclosure",
+    "examples": [
+      "I'm fine, nothing really to report",
+      "Things have been pretty normal I guess"
+    ]
+  },
+  "neutral_response": {
+    "description": "Intent: neutral_response",
+    "examples": [
+      "I'm fine, nothing really to report",
+      "I'm not sure what to say about that",
+      "Things have been pretty normal I guess"
+    ]
+  },
+  "uncertainty": {
+    "description": "Intent: uncertainty",
+    "examples": [
+      "I'm not sure what to say about that"
+    ]
+  },
+  "resistance": {
+    "description": "Intent: resistance",
+    "examples": [
+      "I'd rather not talk about that right now"
+    ]
+  },
+  "boundary_setting": {
+    "description": "Intent: boundary_setting",
+    "examples": [
+      "I'd rather not talk about that right now"
+    ]
+  }
+}
