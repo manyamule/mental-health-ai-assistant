@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, File, UploadFile
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, File, UploadFile, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import asyncio
@@ -11,17 +11,15 @@ import os
 import sys
 from datetime import datetime
 
-# Get the directory where this script is located
+# Add current directory to path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, current_dir)
-
-# Change to the script directory
 os.chdir(current_dir)
 
 print(f"Working directory: {os.getcwd()}")
-print(f"Python path includes: {current_dir}")
 
-# Import modules
+# Import emotion analysis modules FIRST
+print("Loading emotion analysis modules...")
 try:
     from emotion_analysis.emotion_analyzer import EmotionAnalyzer
     from emotion_analysis.voice_analyzer import VoiceAnalyzer
@@ -29,16 +27,34 @@ try:
     from emotion_analysis.multimodal_integration import MultimodalAnalyzer
     from emotion_analysis.document_analyzer import DocumentAnalyzer
     from intent_classification.intent_classifier import IntentClassifier
-    print("✓ All modules imported successfully")
+    print("✓ Emotion analysis modules imported successfully")
 except ImportError as e:
-    print(f"✗ Import Error: {e}")
-    print(f"Make sure you're running from: {current_dir}")
-    print("Directory structure should be:")
-    print("  D:/mental_health/")
-    print("    ├── backend_app.py")
-    print("    ├── emotion_analysis/")
-    print("    └── intent_classification/")
+    print(f"✗ Emotion Analysis Import Error: {e}")
     sys.exit(1)
+
+# Import database and auth modules SECOND
+print("Loading database and auth modules...")
+try:
+    from database.config import connect_to_mongo, close_mongo_connection, get_database
+    from database.crud import save_message
+    from routes.auth_routes import router as auth_router
+    from routes.session_routes import router as session_router
+    from routes.appointment_routes import router as appointment_router
+    from routes.admin_routes import router as admin_router
+    from auth.auth_handler import get_current_user
+    print("✓ Database and auth modules imported successfully")
+    DB_ENABLED = True
+except ImportError as e:
+    print(f"✗ Database Import Error: {e}")
+    print("Continuing without database features...")
+    from fastapi import APIRouter
+    auth_router = APIRouter()
+    session_router = APIRouter()
+    appointment_router = APIRouter()
+    admin_router = APIRouter()
+    DB_ENABLED = False
+    get_database = lambda: None
+    save_message = None
 
 app = FastAPI(title="Mental Health AI Assistant API")
 
@@ -51,21 +67,39 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Database connection events
+@app.on_event("startup")
+async def startup_db_client():
+    await connect_to_mongo()
+    print("✓ Application startup complete")
+
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    await close_mongo_connection()
+    print("✓ Application shutdown complete")
+
+# Include routers
+app.include_router(auth_router)
+app.include_router(session_router)
+app.include_router(appointment_router)
+app.include_router(admin_router)
+
 # Initialize analyzers
-print("Loading models...")
+print("Loading AI models...")
 emotion_analyzer = EmotionAnalyzer("models/my_model.h5")
 voice_analyzer = VoiceAnalyzer()
 face_detector = FaceDetector()
 intent_classifier = IntentClassifier(model_dir="intent_classification/intent_models")
 multimodal_analyzer = MultimodalAnalyzer(emotion_analyzer, intent_classifier, voice_analyzer)
 document_analyzer = DocumentAnalyzer()
-print("Models loaded successfully!")
+print("✓ Models loaded successfully!")
 
 # Store active sessions
 active_sessions = {}
 
 class SessionData:
-    def __init__(self):
+    def __init__(self, user_id: str = None):
+        self.user_id = user_id
         self.conversation_history = []
         self.document_context = None
         self.current_emotion = None
@@ -77,7 +111,8 @@ async def root():
     return {
         "message": "Mental Health AI Assistant API",
         "status": "running",
-        "version": "1.0.0"
+        "version": "2.0.0",
+        "features": ["authentication", "database", "admin_dashboard", "appointments"]
     }
 
 @app.post("/upload_document/")
@@ -100,7 +135,6 @@ async def upload_document(file: UploadFile = File(...)):
         
         # Extract structured information
         if extracted_text:
-            # Try using LLM extraction first, fallback to regex
             extracted_info = document_analyzer.extract_with_llm(extracted_text)
             if not extracted_info:
                 extracted_info = document_analyzer.extract_medical_info(extracted_text)
@@ -143,6 +177,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
         active_sessions[session_id] = SessionData()
     
     session = active_sessions[session_id]
+    db = get_database()
     
     try:
         while True:
@@ -152,7 +187,30 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
             
             message_type = message.get("type")
             
-            if message_type == "video_frame":
+            if message_type == "authenticate":
+                # Authenticate user via token
+                token = message.get("token")
+                try:
+                    from auth.auth_handler import decode_jwt
+                    payload = decode_jwt(token)
+                    if payload:
+                        session.user_id = payload.get("user_id")
+                        await websocket.send_json({
+                            "type": "authenticated",
+                            "data": {"user_id": session.user_id}
+                        })
+                    else:
+                        await websocket.send_json({
+                            "type": "auth_error",
+                            "data": {"message": "Invalid token"}
+                        })
+                except Exception as e:
+                    await websocket.send_json({
+                        "type": "auth_error",
+                        "data": {"message": str(e)}
+                    })
+            
+            elif message_type == "video_frame":
                 # Process video frame for facial emotion
                 frame_data = message.get("frame")
                 emotion_result = await process_video_frame(frame_data, session)
@@ -162,15 +220,26 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     "data": emotion_result
                 })
             
-            elif message_type == "audio_chunk":
-                # Buffer audio chunks
-                audio_data = message.get("audio")
-                session.audio_buffer.append(audio_data)
+            # elif message_type == "audio_chunk":
+            #     # Buffer audio chunks
+            #     audio_data = message.get("audio")
+            #     session.audio_buffer.append(audio_data)
             
             elif message_type == "audio_complete":
                 # Process complete audio
-                print("Processing audio...")
-                analysis_result = await process_audio(session, session_id)
+                audio_data = message.get("audio")
+                mime_type = message.get("mimeType", "audio/webm")
+                size = message.get("size", 0)
+                
+                if not audio_data:
+                    await websocket.send_json({
+                        "type": "error",
+                        "data": {"message": "No audio data received"}
+                    })
+                    continue
+    
+                analysis_result = await process_audio(session, session_id, audio_data, mime_type)
+
                 
                 # Generate response
                 if analysis_result and "transcribed_text" in analysis_result:
@@ -184,10 +253,30 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         # Perform multimodal analysis
                         response = await generate_response(text, face_emotion, analysis_result, session)
                         
+                        # Save to database if user is authenticated
+                        if session.user_id and DB_ENABLED:
+                            try:
+                                db = get_database()
+                                await save_message(db, session_id, session.user_id, "user", text, face_emotion)
+                                await save_message(db, session_id, session.user_id, "assistant", response.get("response", ""), None)
+                            except Exception as e:
+                                print(f"Database save error: {e}")
+                                
                         await websocket.send_json({
                             "type": "analysis_complete",
                             "data": response
                         })
+                        
+                    else:
+                        await websocket.send_json({
+                            "type": "error",
+                            "data": {"message": "Could not transcribe audio. Please try again."}
+                    })
+                else:
+                    await websocket.send_json({
+                        "type": "error",
+                        "data": {"message": "Failed to process audio"}
+                    })
                 
                 # Clear audio buffer
                 session.audio_buffer = []
@@ -199,6 +288,14 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                 
                 response = await generate_response(text, face_emotion, None, session)
                 
+                # Save to database if user is authenticated
+                if session.user_id and DB_ENABLED:
+                    try:
+                        db = get_database()
+                        await save_message(db, session_id, session.user_id, "user", text, face_emotion)
+                        await save_message(db, session_id, session.user_id, "assistant", response.get("response", ""), None)
+                    except Exception as e:
+                        print(f"Database save error: {e}")
                 await websocket.send_json({
                     "type": "response",
                     "data": response
@@ -207,7 +304,6 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
             elif message_type == "set_document_context":
                 # Set document context for this session
                 session.document_context = message.get("document_info")
-                # Set in response generator
                 multimodal_analyzer.response_generator.set_document_context(session.document_context)
                 print("Document context updated")
                 
@@ -274,41 +370,96 @@ async def process_video_frame(frame_data: str, session: SessionData) -> dict:
             "message": str(e)
         }
 
-async def process_audio(session: SessionData, session_id: str) -> dict:
-    """Process buffered audio chunks"""
+async def process_audio(session: SessionData, session_id: str, audio_data: str, mime_type: str = "audio/webm") -> dict:
+    """Process complete audio recording"""
     try:
-        if not session.audio_buffer:
+        if not audio_data:
             return {"status": "no_audio"}
         
-        # Combine audio chunks
-        audio_data = b''.join([base64.b64decode(chunk) for chunk in session.audio_buffer])
+        # Decode base64 audio
+        audio_bytes = base64.b64decode(audio_data)
         
-        # Save to temporary WAV file
+        print(f"Received audio: {len(audio_bytes)} bytes, type: {mime_type}")
+        
+        # Save to temporary file with correct extension
         temp_audio_dir = "temp_audio"
         os.makedirs(temp_audio_dir, exist_ok=True)
-        temp_audio_path = os.path.join(temp_audio_dir, f"recording_{session_id}_{datetime.now().timestamp()}.wav")
         
-        with wave.open(temp_audio_path, 'wb') as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2)  # 16-bit
-            wf.setframerate(16000)
-            wf.writeframes(audio_data)
+        # Determine file extension based on MIME type
+        if 'webm' in mime_type:
+            ext = 'webm'
+        elif 'mp4' in mime_type:
+            ext = 'm4a'
+        elif 'ogg' in mime_type:
+            ext = 'ogg'
+        else:
+            ext = 'webm'  # Default
         
-        print(f"Analyzing audio file: {temp_audio_path}")
+        temp_input_path = os.path.join(temp_audio_dir, f"recording_{session_id}_{datetime.now().timestamp()}.{ext}")
+        temp_wav_path = os.path.join(temp_audio_dir, f"recording_{session_id}_{datetime.now().timestamp()}.wav")
+        
+        # Save original audio
+        with open(temp_input_path, 'wb') as f:
+            f.write(audio_bytes)
+        
+        print(f"Saved audio to: {temp_input_path}")
+        
+        # Convert to WAV using pydub
+        try:
+            from pydub import AudioSegment
+            
+            # Load audio file
+            if ext == 'webm':
+                audio = AudioSegment.from_file(temp_input_path, format="webm")
+            else:
+                audio = AudioSegment.from_file(temp_input_path)
+            
+            # Convert to mono, 16kHz
+            audio = audio.set_channels(1)
+            audio = audio.set_frame_rate(16000)
+            
+            # Export as WAV
+            audio.export(temp_wav_path, format="wav")
+            
+            print(f"Converted to WAV: {temp_wav_path}")
+            
+        except ImportError:
+            # Fallback: Try using ffmpeg directly
+            import subprocess
+            
+            try:
+                subprocess.run([
+                    'ffmpeg', '-i', temp_input_path,
+                    '-ar', '16000',
+                    '-ac', '1',
+                    '-y',
+                    temp_wav_path
+                ], check=True, capture_output=True)
+                
+                print(f"Converted with ffmpeg: {temp_wav_path}")
+            except Exception as e:
+                print(f"FFmpeg conversion failed: {e}")
+                # Last resort: try to use original file
+                temp_wav_path = temp_input_path
         
         # Analyze emotion
-        voice_result = voice_analyzer.analyze_emotion(temp_audio_path)
+        print(f"Analyzing audio file: {temp_wav_path}")
+        voice_result = voice_analyzer.analyze_emotion(temp_wav_path)
         
         # Clean up
         try:
-            os.remove(temp_audio_path)
-        except:
-            pass
+            os.remove(temp_input_path)
+            if os.path.exists(temp_wav_path) and temp_wav_path != temp_input_path:
+                os.remove(temp_wav_path)
+        except Exception as e:
+            print(f"Cleanup error: {e}")
         
         return voice_result
     
     except Exception as e:
         print(f"Error processing audio: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return {
             "status": "error",
             "message": str(e)
@@ -386,15 +537,17 @@ async def health_check():
             "emotion_model": emotion_analyzer.model is not None,
             "intent_classifier": intent_classifier.classifier is not None,
             "voice_analyzer": True
-        }
+        },
+        "database_connected": get_database() is not None
     }
 
 if __name__ == "__main__":
     import uvicorn
     print("\n" + "="*50)
-    print("Mental Health AI Assistant - Backend Server")
+    print("Mental Health AI Assistant - Backend Server v2.0")
     print("="*50)
     print("Starting server on http://localhost:8000")
     print("WebSocket endpoint: ws://localhost:8000/ws/{session_id}")
+    print("API Documentation: http://localhost:8000/docs")
     print("="*50 + "\n")
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=False)
