@@ -119,13 +119,11 @@ Frontend runs on: `http://localhost:3000`
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📝 License
 
-This project is licensed under the MIT License.
 
 ## 👨‍💻 Author
 
-Jarvis - B.Tech IT Student at VIT Pune
+Manoj Mule  - B.Tech IT Student at VIT Pune
 
 ## 🙏 Acknowledgments
 
